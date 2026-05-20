@@ -459,6 +459,23 @@
       background: rgba(255,255,255,.06);
       color: #d9e8ff;
     }
+    .table-wrap {
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+td, th {
+  white-space: nowrap;
+  padding: 10px 12px;
+}
+
+.layout-2 {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 18px;
+  align-items: start;
+}
     @media (max-width: 1100px) {
       .hero, .layout-2, .notes-grid, .metrics, .search-layout { grid-template-columns: 1fr; }
       .toolbar { grid-template-columns: 1fr; }
