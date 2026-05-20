@@ -403,7 +403,7 @@ function mergeRankData() {
   }
 
   return merged
-    .filter((row) => row.close > 0 && row.industry && !row.code.startsWith('00'))
+    .filter((row) => row.close > 0 && row.industry)
     .map((row) => {
       const trailingEpsRef = row.pe > 0 ? row.close / row.pe : 0;
       const annualizedQ = row.epsQ * 4;
