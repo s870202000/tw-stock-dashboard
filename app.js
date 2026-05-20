@@ -54,7 +54,14 @@ function formatNumber(value, digits = 0) {
 }
 
 function formatShares(value) {
-  return `${formatNumber(value)} 股`;
+  const n = Number(value || 0);
+  const absN = Math.abs(n);
+  if (absN >= 100000000) {
+    return `${(n / 100000000).toFixed(2)} 億`;
+  } else if (absN >= 10000) {
+    return `${(n / 10000).toFixed(1)} 萬`;
+  }
+  return `${formatNumber(n)} 股`;
 }
 
 function formatMoney(value) {
