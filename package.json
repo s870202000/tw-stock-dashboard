@@ -1,9 +1,5 @@
 {
-  "name": "tw-stock-dashboard-stable",
+  "name": "tw-stock-dashboard",
   "version": "1.0.0",
-  "private": true,
-  "description": "Deployable Taiwan stock dashboard with Vercel serverless API proxy",
-  "engines": {
-    "node": ">=20"
-  }
+  "dependencies": {}
 }
