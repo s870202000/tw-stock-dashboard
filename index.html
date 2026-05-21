@@ -3,627 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>台股法人/散戶儀表板</title>
+  <title>台股籌碼觀測站 V3.1</title>
   <style>
     :root {
-      --bg: #08111f;
-      --panel: #0f1b2d;
-      --panel-2: #13233b;
-      --line: rgba(255,255,255,.08);
-      --text: #eaf2ff;
-      --muted: #9fb2d1;
-      --brand: #4ea1ff;
-      --brand-2: #79f7c4;
-      --danger: #ff6b7a;
-      --warn: #ffca5c;
-      --good: #3dd598;
-      --shadow: 0 18px 40px rgba(0,0,0,.35);
-      --radius: 18px;
+      --bg: #08111f; --panel: #0f1b2d; --line: rgba(255,255,255,.08);
+      --text: #eaf2ff; --muted: #9fb2d1; --brand: #4ea1ff;
+      --good: #3dd598; --danger: #ff6b7a; --radius: 18px;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Inter, "Noto Sans TC", system-ui, -apple-system, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top right, rgba(78,161,255,.16), transparent 30%),
-        radial-gradient(circle at top left, rgba(121,247,196,.12), transparent 30%),
-        linear-gradient(180deg, #08111f, #050a14 55%, #08101d);
-      min-height: 100vh;
-    }
-    a { color: #97c2ff; }
-    .shell {
-      width: min(1480px, calc(100vw - 32px));
-      margin: 24px auto 48px;
-    }
-    .hero {
-      display: grid;
-      grid-template-columns: 1.4fr .8fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-    .card {
-      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .hero-main {
-      padding: 28px;
-    }
-    .badge-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-    .badge {
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(78,161,255,.14);
-      border: 1px solid rgba(78,161,255,.28);
-      color: #cde2ff;
-      font-size: 13px;
-    }
-    h1 {
-      margin: 0 0 12px;
-      font-size: clamp(28px, 4vw, 44px);
-      line-height: 1.08;
-    }
-    .lead {
-      margin: 0;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.8;
-      max-width: 72ch;
-    }
-    .hero-side {
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      justify-content: center;
-    }
-    .mini-stat {
-      padding: 14px 16px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.035);
-      border: 1px solid var(--line);
-    }
-    .mini-stat .k { color: var(--muted); font-size: 13px; }
-    .mini-stat .v { font-size: 22px; font-weight: 800; margin-top: 6px; }
-    .toolbar {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 14px;
-      padding: 18px 20px;
-      margin-bottom: 18px;
-      align-items: center;
-    }
-    .search-layout {
-      display: grid;
-      grid-template-columns: .95fr 1.05fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-    .toolbar-left {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .toolbar-right {
-      justify-self: end;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 200px;
-    }
-    .field label {
-      font-size: 13px;
-      color: var(--muted);
-    }
+    body { margin: 0; font-family: sans-serif; color: var(--text); background: var(--bg); min-height: 100vh; padding: 20px; }
+    .shell { width: min(1480px, calc(100vw - 32px)); margin: 0 auto; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,.3); margin-bottom: 20px; }
+    .toolbar { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 20px; }
     input[type="date"], input[type="search"] {
-      background: #08111f;
-      color: var(--text);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font: inherit;
-      width: 100%;
+      background: #16243a; color: #fff; border: 2px solid var(--brand);
+      border-radius: 12px; padding: 12px; font-size: 16px; font-weight: bold;
     }
-    .btn {
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font: inherit;
-      font-weight: 700;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--brand), #2d73ff);
-      color: white;
-      box-shadow: 0 10px 24px rgba(45,115,255,.28);
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(48%) sepia(79%) saturate(1000%) hue-rotate(190deg); cursor: pointer;
     }
-    .mini-btn {
-      border: 1px solid rgba(78,161,255,.28);
-      background: rgba(78,161,255,.12);
-      color: #d9e8ff;
-      border-radius: 10px;
-      padding: 8px 10px;
-      font: inherit;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .mini-btn.active {
-      background: rgba(121,247,196,.16);
-      border-color: rgba(121,247,196,.34);
-      color: #ccffef;
-    }
-    .switch {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: rgba(255,255,255,.03);
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .switch input { accent-color: var(--brand); }
-    .hint {
-      margin: 10px 4px 0;
-      color: var(--warn);
-      font-size: 13px;
-    }
-    .status {
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .status[data-type="ok"] { color: var(--good); }
-    .status[data-type="error"] { color: var(--danger); }
-    .status[data-type="loading"] { color: var(--warn); }
-    .metrics {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-    .metric-card {
-      padding: 18px;
-      min-height: 120px;
-    }
-    .metric-card-warn { outline: 1px solid rgba(255,202,92,.35); }
-    .metric-label { color: var(--muted); font-size: 13px; }
-    .metric-value { font-size: 30px; font-weight: 800; margin-top: 10px; }
-    .metric-sub { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.6; }
-    .layout-2 {
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-    .section-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: end;
-      padding: 20px 22px 0;
-    }
-    .section-head h2 {
-      margin: 0;
-      font-size: 22px;
-    }
-    .section-head p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-      max-width: 72ch;
-    }
-    .section-body {
-      padding: 18px 22px 22px;
-    }
-    .table-wrap {
-      overflow: auto;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255,255,255,.02);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 1080px;
-    }
-    th, td {
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--line);
-      font-size: 13px;
-      text-align: left;
-      white-space: nowrap;
-    }
-    th {
-      position: sticky;
-      top: 0;
-      background: #102039;
-      color: #d9e8ff;
-      z-index: 1;
-    }
-    tr:hover td { background: rgba(255,255,255,.03); }
-    .up { color: var(--good); }
-    .down { color: var(--danger); }
-    .bars {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .bar-row {
-      display: grid;
-      grid-template-columns: 110px 1fr 120px;
-      gap: 12px;
-      align-items: center;
-    }
-    .bar-label, .bar-value {
-      font-size: 13px;
-      color: var(--text);
-    }
-    .bar-track {
-      height: 16px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.07);
-      overflow: hidden;
-      border: 1px solid var(--line);
-    }
-    .bar-fill {
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #3dd598, #79f7c4);
-    }
-    .bar-fill.negative {
-      background: linear-gradient(90deg, #ff8e8e, #ff6b7a);
-    }
-    .chips {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .industry-chip {
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .industry-chip b { color: var(--text); }
-    .industry-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-      margin-top: 16px;
-    }
-    .industry-block {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      overflow: hidden;
-      background: rgba(255,255,255,.02);
-    }
-    .industry-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      background: rgba(255,255,255,.03);
-      border-bottom: 1px solid var(--line);
-    }
-    .industry-head h3 {
-      margin: 0;
-      font-size: 16px;
-    }
-    .notes-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-      margin-top: 18px;
-    }
-    .note-card {
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: rgba(255,255,255,.025);
-    }
-    .note-card h3 { margin-top: 0; }
-    .note-card ul {
-      padding-left: 20px;
-      margin: 12px 0 0;
-      color: var(--muted);
-      line-height: 1.8;
-      font-size: 14px;
-    }
-    .search-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-    .search-results {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-      margin-top: 14px;
-    }
-    .stock-card {
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: rgba(255,255,255,.025);
-      padding: 14px;
-    }
-    .stock-card-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: start;
-      margin-bottom: 10px;
-    }
-    .stock-name {
-      font-size: 18px;
-      font-weight: 800;
-    }
-    .stock-meta {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 4px;
-    }
-    .stock-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .stock-grid div {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      background: rgba(255,255,255,.02);
-    }
-    .stock-grid span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 6px;
-    }
-    .stock-grid b {
-      font-size: 15px;
-    }
-    .empty-box {
-      border: 1px dashed rgba(255,255,255,.18);
-      border-radius: 14px;
-      padding: 20px;
-      color: var(--muted);
-      background: rgba(255,255,255,.02);
-    }
-    .watchlist-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .footer-note {
-      margin-top: 18px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.9;
-    }
-    .loading-mask {
-      position: fixed;
-      inset: 0;
-      display: none;
-      place-items: center;
-      background: rgba(3, 8, 18, .66);
-      backdrop-filter: blur(6px);
-      z-index: 99;
-    }
-    .loading-mask.show { display: grid; }
-    .loading-box {
-      width: min(420px, calc(100vw - 40px));
-      padding: 22px;
-      border-radius: 18px;
-      background: #0f1b2d;
-      border: 1px solid var(--line);
-      text-align: center;
-      box-shadow: var(--shadow);
-    }
-    .spinner {
-      width: 42px;
-      height: 42px;
-      margin: 0 auto 14px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,.12);
-      border-top-color: var(--brand);
-      animation: spin .9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      padding: 2px 6px;
-      border-radius: 8px;
-      background: rgba(255,255,255,.06);
-      color: #d9e8ff;
-    }
-    @media (max-width: 1100px) {
-      .hero, .layout-2, .notes-grid, .metrics, .search-layout { grid-template-columns: 1fr; }
-      .toolbar { grid-template-columns: 1fr; }
-      .toolbar-right { justify-self: start; }
-    }
-    @media (max-width: 720px) {
-      .shell { width: min(100vw - 18px, 1480px); margin: 10px auto 36px; }
-      .hero-main, .hero-side, .section-body, .section-head, .toolbar { padding-left: 16px; padding-right: 16px; }
-      .bar-row { grid-template-columns: 90px 1fr 92px; }
-      .metric-value { font-size: 24px; }
-      .stock-grid { grid-template-columns: 1fr 1fr; }
-    }
+    .btn { background: var(--brand); color: #fff; border: 0; padding: 14px 30px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+    
+    /* 排版核心修正 */
+    .layout-2 { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+    .table-wrap { overflow-x: auto; width: 100%; border-radius: 12px; border: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { padding: 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+    th { background: rgba(255,255,255,0.05); }
+    .up { color: var(--good); } .down { color: var(--danger); }
+    
+    @media (max-width: 1100px) { .layout-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class="loading-mask" id="loadingMask">
-    <div class="loading-box">
-      <div class="spinner"></div>
-      <div id="loadingText">資料載入中…</div>
+  <div class="shell">
+    <div class="card">
+      <h1>台股法人/散戶籌碼觀測站</h1>
+      <div class="toolbar">
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <label style="font-size:13px; color:var(--muted)">查詢日期</label>
+          <input type="date" id="dateInput">
+        </div>
+        <button class="btn" id="refreshBtn">重新整理</button>
+        <span id="statusText" style="color:var(--muted); font-size:14px; margin-left:10px;">載入中...</span>
+      </div>
+    </div>
+    <div class="card">
+      <h2>個股/ETF 搜尋</h2>
+      <input type="search" id="stockSearch" style="width:100%" placeholder="輸入代號或名稱，例如 2330、台積電、0050">
+    </div>
+    <div class="layout-2">
+      <div class="card">
+        <h2>1. 每日法人 / 散戶買賣量綜合</h2>
+        <div id="flowSummaryTable" class="table-wrap"></div>
+      </div>
+      <div class="card">
+        <h2>量能摘要</h2>
+        <div id="flowBars" style="display:flex; flex-direction:column; gap:15px;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>最新財報潛力前 20</h2>
+      <div id="potentialTable" class="table-wrap"></div>
     </div>
   </div>
-
-  <div class="shell">
-    <section class="hero">
-      <div class="card hero-main">
-        <div class="badge-row">
-          <span class="badge">台股法人 / 散戶每日綜合</span>
-          <span class="badge">最新財報潛力前 20</span>
-          <span class="badge">低估值前 20</span>
-        </div>
-        <h1>台股多因子研究儀表板</h1>
-        <p class="lead">
-          這份網頁把你要的 4 個功能整合在同一頁：每日外資／法人／散戶買賣量綜合、依最新財報挑出潛力前 20 名、低估但仍有獲利的 20 檔，以及日期切換與自動刷新。
-          目前採用 TWSE 與 TPEx 公開資料；上市可依日期切換，上櫃與財報排行則使用官方最新可得快照。
-        </p>
-      </div>
-      <div class="card hero-side">
-        <div class="mini-stat">
-          <div class="k">資料刷新</div>
-          <div class="v">每 3 分鐘</div>
-        </div>
-        <div class="mini-stat">
-          <div class="k">排序邏輯</div>
-          <div class="v">獲利 × 估值 × 產業</div>
-        </div>
-        <div class="mini-stat">
-          <div class="k">市場涵蓋</div>
-          <div class="v">上市 + 上櫃</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card toolbar">
-      <div>
-        <div class="toolbar-left">
-          <div class="field">
-            <label for="dateInput">查詢日期</label>
-            <input id="dateInput" type="date" />
-          </div>
-          <button class="btn" id="refreshBtn">重新整理</button>
-          <label class="switch"><input id="autoRefresh" type="checkbox" checked /> 自動刷新</label>
-        </div>
-        <div class="hint" id="dateHint">日期切換已套用到上市每日綜合；上櫃與財報排行採官方最新公開快照。</div>
-      </div>
-      <div class="status" id="statusText" data-type="info">待載入</div>
-      <div class="toolbar-right" id="lastUpdated">上次更新：尚未載入</div>
-    </section>
-
-    <section class="metrics" id="overviewCards"></section>
-
-    <section class="search-layout">
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <h2>個股搜尋</h2>
-            <p>支援股票代號、公司名稱、產業關鍵字查詢。搜尋結果可以直接加入自選股。</p>
-          </div>
-        </div>
-        <div class="section-body">
-          <div class="search-stack">
-            <div class="field" style="min-width:0;">
-              <label for="stockSearch">搜尋輸入</label>
-              <input id="stockSearch" type="search" placeholder="例如：2330、台積電、半導體、金融" />
-            </div>
-            <div class="search-results" id="searchResults"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <h2>自選股</h2>
-            <p>自選股會儲存在你的瀏覽器 localStorage，重新開啟網站後仍會保留。</p>
-          </div>
-        </div>
-        <div class="section-body">
-          <div class="watchlist-head">
-            <span>自選名單</span>
-            <span id="watchlistMeta">共 0 檔</span>
-          </div>
-          <div id="watchlistTable"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="layout-2">
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <h2>1. 每日法人 / 散戶買賣量綜合</h2>
-            <p>表格同時列出上市、上櫃與綜合欄；若日期未對齊，綜合欄會以目前可對齊的官方資料處理。</p>
-          </div>
-        </div>
-        <div class="section-body" id="flowSummaryTable"></div>
-      </div>
-
-      <div class="card">
-        <div class="section-head">
-          <div>
-            <h2>量能視覺摘要</h2>
-            <p>用簡單橫條快速判讀外資、投信、自營商、三大法人與散戶推估量。</p>
-          </div>
-        </div>
-        <div class="section-body">
-          <div class="bars" id="flowBars"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="section-head">
-        <div>
-          <h2>2. 最新財報推估潛力前 20 名</h2>
-          <p>依最新單季 EPS、稅後淨利、成長代理值、殖利率、低本益比與低股價淨值比綜合排序，再依產業分組展示。</p>
-        </div>
-      </div>
-      <div class="section-body">
-        <div class="chips" id="potentialMeta"></div>
-        <div class="industry-grid" id="potentialTables"></div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:18px;">
-      <div class="section-head">
-        <div>
-          <h2>3. 20 檔被低估股票</h2>
-          <p>先保留仍有獲利、單季 EPS 為正、且市價不高的個股，再依估值與獲利綜合排序，適合作為價值型觀察清單。</p>
-        </div>
-      </div>
-      <div class="section-body" id="undervaluedTable"></div>
-    </section>
-
-    <section class="notes-grid" id="methodology"></section>
-
-    <section class="footer-note">
-      資料來源：
-      <a href="https://www.twse.com.tw/zh/trading/foreign/t86.html" target="_blank" rel="noreferrer">TWSE 三大法人買賣超日報</a>、
-      <a href="https://www.twse.com.tw/zh/trading/statistics/index05.html" target="_blank" rel="noreferrer">TWSE 上市公司季報</a>、
-      <a href="https://openapi.twse.com.tw/" target="_blank" rel="noreferrer">TWSE OpenAPI</a>、
-      <a href="https://www.tpex.org.tw/openapi/" target="_blank" rel="noreferrer">TPEx OpenAPI</a>、
-      <a href="https://www.tpex.org.tw/zh-tw/mainboard/listed/financial/summary.html" target="_blank" rel="noreferrer">TPEx 上櫃公司季報</a>。
-    </section>
-  </div>
-
   <script src="./app.js"></script>
 </body>
 </html>
+
